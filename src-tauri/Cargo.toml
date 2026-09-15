@@ -1,0 +1,37 @@
+[package]
+name = "media-ai-workbench"
+version = "0.1.0"
+description = "自媒体 AI 工作台 —— 心身同调领域学员的本地内容创作工作台"
+authors = ["you"]
+edition = "2021"
+
+[lib]
+# _lib 后缀用于在 Windows 上避免 lib 名与 bin 名冲突
+name = "media_ai_workbench_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["protocol-asset"] }
+rusqlite = { version = "0.32", features = ["bundled"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+# AI 适配层
+reqwest = { version = "0.12", features = ["json"] }
+# API Key 本地加密（AES-256-GCM）+ 主密钥托管
+aes-gcm = "0.10"
+base64 = "0.22"
+keyring = { version = "3.6", features = ["windows-native", "apple-native"] }
+# 图片缩略图
+image = { version = "0.25", default-features = false, features = ["jpeg", "png", "webp"] }
+# 系统文件选择框
+rfd = "0.15"
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = 3
+panic = "abort"
+strip = true

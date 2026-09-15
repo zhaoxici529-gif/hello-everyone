@@ -1,0 +1,111 @@
+name: 发布安装包
+
+# 推 v* 标签自动出包并建草稿 Release；
+# 也可以手动触发（Actions 页面 Run workflow），只出构建产物、不发 Release。
+# 没有 Mac 时就用手动触发验证 dmg 能不能打出来。
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bundle:
+    name: 打包 ${{ matrix.name }}
+    runs-on: ${{ matrix.platform }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows
+            platform: windows-latest
+            args: ''
+          - name: macOS
+            platform: macos-14
+            args: '--target universal-apple-darwin'
+    steps:
+      - name: 取出代码
+        uses: actions/checkout@v4
+
+      - name: 装 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: 装 Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: 装 Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: macOS 补两个架构（通用包用）
+        if: matrix.platform == 'macos-14'
+        shell: bash
+        run: rustup target add aarch64-apple-darwin x86_64-apple-darwin
+
+      - name: 缓存 Rust 依赖
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+
+      - name: 注入体验 Key
+        shell: bash
+        env:
+          TRIAL_API_KEY: ${{ secrets.TRIAL_API_KEY }}
+        run: node scripts/inject-trial-key.mjs
+
+      - name: 配置 macOS 签名（没配证书就跳过，出未签名 dmg）
+        if: matrix.platform == 'macos-14'
+        shell: bash
+        env:
+          CERT: ${{ secrets.APPLE_CERTIFICATE }}
+          CERT_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID_VALUE: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD_VALUE: ${{ secrets.APPLE_PASSWORD }}
+          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          if [ -z "$CERT" ]; then
+            echo "未配置 APPLE_CERTIFICATE，本次输出未签名的 dmg（用户首次打开需右键→打开）"
+            exit 0
+          fi
+          {
+            echo "APPLE_CERTIFICATE=$CERT"
+            echo "APPLE_CERTIFICATE_PASSWORD=$CERT_PASSWORD"
+            echo "APPLE_SIGNING_IDENTITY=$IDENTITY"
+            echo "APPLE_ID=$APPLE_ID_VALUE"
+            echo "APPLE_PASSWORD=$APPLE_PASSWORD_VALUE"
+            echo "APPLE_TEAM_ID=$TEAM_ID"
+          } >> "$GITHUB_ENV"
+          echo "已配置 macOS 签名与公证"
+
+      - name: 安装前端依赖
+        run: pnpm install --frozen-lockfile
+
+      - name: 编译并打包
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || '' }}
+          releaseName: '自媒体 AI 工作台 __VERSION__'
+          releaseBody: '安装包见下方 Assets。安装、使用与获取 API Key 见仓库里的《使用说明.md》。'
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}
+
+      - name: 上传安装包
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.name }}-安装包
+          if-no-files-found: warn
+          path: |
+            src-tauri/target/**/release/bundle/**/*.dmg
+            src-tauri/target/**/release/bundle/**/*.msi
+            src-tauri/target/**/release/bundle/**/*.exe

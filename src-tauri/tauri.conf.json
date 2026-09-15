@@ -1,0 +1,63 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "自媒体 AI 工作台",
+  "version": "0.1.0",
+  "identifier": "com.xinshentongdiao.mediaworkbench",
+  "build": {
+    "beforeDevCommand": "pnpm dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "pnpm build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "自媒体 AI 工作台",
+        "width": 1360,
+        "height": 840,
+        "minWidth": 1080,
+        "minHeight": 620,
+        "center": true,
+        "resizable": true,
+        "backgroundColor": "#0f1210"
+      }
+    ],
+    "security": {
+      "csp": null,
+      "assetProtocol": {
+        "enable": true,
+        "scope": ["**"]
+      }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis", "msi", "app", "dmg"],
+    "publisher": "心身同调",
+    "category": "Productivity",
+    "shortDescription": "自媒体 AI 工作台",
+    "longDescription": "面向心身同调领域学员的本地内容创作工作台：人物小传、素材库、AI 写作、文案管理与本地记忆库。",
+    "copyright": "© 2026 心身同调",
+    "windows": {
+      "nsis": {
+        "displayLanguageSelector": false,
+        "languages": ["SimpChinese", "English"],
+        "installMode": "currentUser"
+      },
+      "wix": {
+        "language": "zh-CN"
+      }
+    },
+    "macOS": {
+      "minimumSystemVersion": "10.15"
+    },
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  }
+}

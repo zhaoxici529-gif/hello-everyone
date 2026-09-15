@@ -1,0 +1,31 @@
+{
+  "name": "media-ai-workbench",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "自媒体 AI 工作台 —— 心身同调领域学员的本地内容创作桌面工作台",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "vue-tsc --noEmit",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "2.11.1",
+    "naive-ui": "2.45.3",
+    "pinia": "3.0.4",
+    "vue": "3.5.42",
+    "vue-router": "4.6.4"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "2.11.4",
+    "@vitejs/plugin-vue": "6.0.8",
+    "typescript": "6.0.3",
+    "vite": "8.3.0",
+    "vue-tsc": "3.3.11"
+  },
+  "packageManager": "pnpm@10.34.5"
+}

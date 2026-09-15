@@ -1,0 +1,11 @@
+# 统一用 LF：仓库里的 shell 脚本要在 macOS / Linux 上跑，CRLF 会让它直接报错
+* text=auto eol=lf
+
+# 二进制文件别做换行符转换
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.icns binary
+*.db binary

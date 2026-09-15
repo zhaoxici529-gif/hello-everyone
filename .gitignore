@@ -1,0 +1,14 @@
+node_modules
+dist
+dist-ssr
+*.local
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+
+# Rust / Tauri
+src-tauri/target
+
+# 打包产物（便携版与本地日志，不入库）
+自媒体AI工作台.exe
+log/

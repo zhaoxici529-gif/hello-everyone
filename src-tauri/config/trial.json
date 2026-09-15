@@ -1,0 +1,8 @@
+{
+  "_comment": "应用内置体验 Key。上线前把 apiKey 换成真实 Key，或把 enabled 改成 false 关闭体验额度。",
+  "enabled": true,
+  "freeQuota": 3,
+  "provider": "deepseek",
+  "model": "deepseek-chat",
+  "apiKey": "sk-在此填入体验Key"
+}
